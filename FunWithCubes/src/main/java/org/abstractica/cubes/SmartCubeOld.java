@@ -1,11 +1,11 @@
-package org.abstractica.cubes.v2;
+package org.abstractica.cubes;
 
 import org.abstractica.javacsg.Geometry2D;
 import org.abstractica.javacsg.Geometry3D;
 import org.abstractica.javacsg.JavaCSG;
 import org.abstractica.javacsg.JavaCSGFactory;
 
-public class SmartCube
+public class SmartCubeOld
 {
 	private final JavaCSG csg;
 	private final int angularResolution = 128;
@@ -52,7 +52,7 @@ public class SmartCube
 
 
 
-	public SmartCube(JavaCSG csg, double unitSize)
+	public SmartCubeOld(JavaCSG csg, double unitSize)
 	{
 		this.csg = csg;
 		this.unitSize = unitSize;
@@ -303,7 +303,7 @@ public class SmartCube
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		SmartCube smartCube = new SmartCube(csg, 8);
+		SmartCubeOld smartCube = new SmartCubeOld(csg, 8);
 		Geometry3D res = smartCube.getBBPlate(13.2, 5);
 		//res = csg.rotate3DX(csg.degrees(90)).transform(res);
 		csg.view(res,1);
