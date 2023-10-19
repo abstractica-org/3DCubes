@@ -70,7 +70,7 @@ public class SmartCubeFeatures
 		//Connector
 		this.connectorSlitWidth = 0.4*unit;
 		this.connectorSlitLength = unit;
-		this.connectorWidth = 0.75*unit; // Must be the same as axle width
+		this.connectorWidth = 0.8*unit; // Must be the same as axle width
 		this.connectorBaseDiameter = 1.5*unit+1; //Test bigger holes
 
 		//Turnplate
@@ -221,8 +221,6 @@ public class SmartCubeFeatures
 		return getConnectorBaseShape(baseHoleSideAdjust, baseHoleEndAdjust, extraLength);
 	}
 
-
-
 	public Geometry3D getConnectorBaseShape(double adjustSide, double adjustEnd, double extraLength)
 	{
 		double baseHeight = 0.5*cubeDistance;
@@ -268,16 +266,39 @@ public class SmartCubeFeatures
 		return nutCutout;
 	}
 
+	public Geometry3D getTurnPlate()
+	{
+		Geometry3D plate = csg.cylinder3D(turnPlateDiameter, 0.5*unit, angularResolution, false);
+		Geometry3D cutout = getConntorBaseCutout(0);
+		cutout = csg.mirror3D(0,0,1).transform(cutout);
+		cutout = csg.translate3DZ(0.5*unit).transform(cutout);
+		return csg.difference3D(plate, cutout);
+	}
+
+	public Geometry3D getLockPlate()
+	{
+		Geometry3D lockPlate = csg.box3D(3*unit, 3*unit, 0.5*unit, false);
+		Geometry3D cutout = getConntorBaseCutout(0);
+		lockPlate = csg.difference3D(lockPlate, cutout);
+		Geometry3D balls = getAddOnBalls();
+		balls = csg.translate3DZ(0.5*unit).transform(balls);
+		lockPlate = csg.union3D(lockPlate, balls);
+		return lockPlate;
+	}
+
 
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createDefault();
 		SmartCubeFeatures features = new SmartCubeFeatures(csg, 8, 128);
 
+		Geometry3D test = features.getLockPlate();
+		//Geometry3D test = features.getTurnPlate();
 		//Geometry3D test = features.getConnectorBaseShape(0,0);
 		//Geometry3D test = features.getDoubleBaseConnector(2);
 		//Geometry3D test = features.getNutCutout(5.6, 3.2, 3.4, 6, 2.0);
-		Geometry3D test = features.getDoubleBaseConnector(0);
+		//Geometry3D test = features.getDoubleBaseConnector(0);
+		//test = csg.rotate3DX(csg.degrees(-90)).transform(test);
 		csg.view(test);
 	}
 

@@ -43,7 +43,7 @@ public class SmartCube
 
 		Geometry3D xCylinder = csg.cylinder3D(unit+1, xSize - 3*unit, angularResolution, false); //Hard coded for now! DO FIX!
 		xCylinder = csg.rotate3DY(csg.degrees(90)).transform(xCylinder);
-		xCylinder.debugMark();
+		//xCylinder.debugMark();
 		cutoutList.add(xCylinder);
 
 		//Get the sphere cutouts
@@ -113,21 +113,6 @@ public class SmartCube
 		return axle;
 	}
 
-	public Geometry3D getSupportPlate()
-	{
-		Geometry3D plate = csg.box3D(8*unit, 3*unit, 0.5*unit, false);
-		Geometry3D balls = features.getAddOnBalls();
-		balls = csg.translate3DZ(0.5*unit).transform(balls);
-		balls = csg.translate3DX(-unit*2).transform(balls);
-		balls = csg.union3D(balls, csg.translate3DX(unit*4).transform(balls));
-		plate = csg.union3D(plate, balls);
-		Geometry3D baseCutout = features.getConntorBaseCutout(0);
-		baseCutout = csg.translate3DX(-unit*2).transform(baseCutout);
-		baseCutout = csg.union3D(baseCutout, csg.translate3DX(unit*4).transform(baseCutout));
-		plate = csg.difference3D(plate, baseCutout);
-		return plate;
-	}
-
 	public Geometry3D getScrewHead()
 	{
 		Geometry3D base = features.getConnectorBaseShape(0,0,0);
@@ -139,65 +124,56 @@ public class SmartCube
 		return base;
 	}
 
-	public Geometry3D getThrustBBPlate()
-	{
-		Geometry3D plate = csg.box3D(3*unit, 3*unit, 0.5*unit-0.4, false);
-		plate = csg.translate3DZ(0.4).transform(plate);
-		Geometry3D balls = features.getAddOnBalls();
-		balls = csg.translate3DZ(0.5*unit).transform(balls);
-		plate = csg.union3D(plate, balls);
-		double height = 2.4;
-		Geometry3D bottom = csg.cylinder3D(16.2, height, angularResolution, false);
-		Geometry3D middle = csg.cone3D(16.2, 16.2-(0.5*unit - height), 0.5*unit - height, angularResolution, false);
-		middle = csg.translate3DZ(height).transform(middle);
-		Geometry3D cutout = csg.union3D(bottom, middle);
-		plate = csg.difference3D(plate, cutout);
-		return plate;
-	}
 
-	public Geometry3D getThrustBBPlateA()
+	public Geometry3D tapShape(double adjust)
 	{
-		Geometry3D plate = csg.box3D(3*unit, 3*unit, 2.2, false);
-		Geometry3D balls = features.getAddOnBalls();
-		balls = csg.translate3DZ(2.2).transform(balls);
-		plate = csg.union3D(plate, balls);
-		Geometry3D cutout = csg.cylinder3D(16.2, 2, angularResolution, false);
-		Geometry3D edge = csg.cylinder3D(15.8, 0.2, angularResolution, false);
-		edge = csg.translate3DZ(2).transform(edge);
-		plate = csg.difference3D(plate, cutout, edge);
-		return plate;
+		Geometry3D tap = csg.cylinder3D(0.5*unit + adjust, 0.25*unit, angularResolution/2, false);
+		Geometry3D tapTop = csg.sphere3D(0.5*unit + adjust, angularResolution/2, true);
+		tapTop = csg.translate3DZ(0.25*unit).transform(tapTop);
+		tap = csg.union3D(tap, tapTop);
+		return tap;
 	}
-
-	public Geometry3D getThrustBBPlateB()
-	{
-		Geometry3D plate = csg.box3D(3*unit, 3*unit, 2.4, false);
-		Geometry3D balls = features.getAddOnBalls();
-		balls = csg.translate3DZ(2.4).transform(balls);
-		plate = csg.union3D(plate, balls);
-		Geometry3D cutoutBalls = features.getCutoutBalls();
-		plate = csg.difference3D(plate, cutoutBalls);
-		Geometry3D cutoutHole = features.getAxleCutout(unit);
-		plate = csg.difference3D(plate, cutoutHole);
-		return plate;
-	}
-
 
 	public static void main(String[] args) throws IOException
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		SmartCube sc = new SmartCube(csg, 8, 128);
-		csg.view(sc.getBasicBlock(3),1);
+		//Geometry3D supportPlate = sc.getSupportPlate();
+		//csg.view(supportPlate);
+		Geometry3D block = sc.getBasicBlock(4);
+		csg.view(block);
+
+		/*
+		Geometry3D halfBlock = csg.slice3DZ(-20, 0,block);
+
+		Geometry3D tapFemale = sc.tapShape(0);
+		tapFemale = csg.mirror3D(0,0,1).transform(tapFemale);
+		Geometry3D tapMale = sc.tapShape(0);
+
+		Geometry3D tap1 = csg.translate3D(8, 8, 0).transform(tapMale);
+		Geometry3D tap2 = csg.translate3D(-8, -8, 0).transform(tapMale);
+		Geometry3D tap3 = csg.translate3D(8, -8, 0).transform(tapFemale);
+		Geometry3D tap4 = csg.translate3D(-8, 8, 0).transform(tapFemale);
+
+		halfBlock = csg.union3D(halfBlock, tap1, tap2);
+		halfBlock = csg.difference3D(halfBlock, tap3, tap4);
+		csg.view(halfBlock);
+
+		//csg.view(sc.getAxle(4));
+		*/
 
 		/*
 		for(int i = 1; i <= 10; ++i)
 		{
 			System.out.println("Creating block: " + i);
 			Geometry3D block = sc.getBasicBlock(i);
-			csg.saveSTL("OpenSCAD/Blocks/Block_"+i+".stl", block);
+			csg.saveSTL("OpenSCAD/NewBlocks/Block_"+i+".stl", block);
 			System.out.println("Block " + i + " Done!");
 		}
 		*/
+
 	}
+
 
 
 }
