@@ -275,7 +275,7 @@ public class Features
 		//Geometry3D test = features.axle2(6);
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
-		Geometry3D test = features.baseClicker(1);
+		Geometry3D test = features.doubleBaseClicker(1, 1);
 		test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
 		//Geometry3D test = features.doubleBaseClicker(3,3);

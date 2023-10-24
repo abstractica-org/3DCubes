@@ -7,13 +7,13 @@ import org.abstractica.javacsg.JavaCSGFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicBrick
+public class BasicBricks
 {
 	private final JavaCSG csg;
 	private final double scale;
 	private final Features features;
 
-	public BasicBrick(JavaCSG csg, double scale, int angularResolution)
+	public BasicBricks(JavaCSG csg, double scale, int angularResolution)
 	{
 		this.csg = csg;
 		this.scale = scale;
@@ -158,8 +158,8 @@ public class BasicBrick
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		BasicBrick bb = new BasicBrick(csg, 1.0, 16);
-		Geometry3D brick = bb.basicBrick(2, 1, 1);
+		BasicBricks bb = new BasicBricks(csg, 1.0, 16);
+		Geometry3D brick = bb.basicBrick(2, 1, 2);
 		csg.view(brick, 0);
 	}
 }

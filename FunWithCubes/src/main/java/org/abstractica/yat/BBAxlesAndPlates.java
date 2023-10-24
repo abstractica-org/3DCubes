@@ -48,7 +48,15 @@ public class BBAxlesAndPlates
 		return lock;
 	}
 
-	Geometry2D axleProfile(double length)
+	public Geometry3D bbDummy()
+	{
+		Geometry2D profile = csg.circle2D(16, angularResolution);
+		profile = csg.difference2D(profile, csg.circle2D(8.4, angularResolution));
+		Geometry3D bb = csg.linearExtrude(5, false, profile);
+		return bb;
+	}
+
+	public Geometry2D axleProfile(double length)
 	{
 		List<Vector2D> points = new ArrayList<>();
 		points.add(csg.vector2D(0, 0));
@@ -85,8 +93,12 @@ public class BBAxlesAndPlates
 	public Geometry3D bbPlate2()
 	{
 		Geometry3D plate = csg.box3D(24, 24, 3.6, false);
-		Geometry3D bbCutout = csg.cylinder3D(16.1, 3.6, angularResolution, false);
+		/*Geometry3D bbCutout = csg.cylinder3D(16.1, 3.6, angularResolution, false);*/
 		Geometry3D cross = csg.linearExtrude(1.4, false, roundCross(0.1));
+		Geometry3D bbCutout = csg.cylinder3D(16.1, 2.2, angularResolution, false);
+		Geometry3D bbLock = csg.cone3D(16.1, 13.3, 1.4, angularResolution, false);
+		bbLock = csg.translate3DZ(2.2).transform(bbLock);
+		bbCutout = csg.union3D(bbCutout, bbLock);
 		cross = csg.translate3DZ(2.2).transform(cross);
 		bbCutout = csg.union3D(bbCutout, cross);
 		plate = csg.difference3D(plate, bbCutout);
@@ -228,7 +240,7 @@ public class BBAxlesAndPlates
 		List<Geometry3D> union = new ArrayList<>();
 		Geometry3D cross = csg.linearExtrude(1.4, false, roundCross(0.0));
 		union.add(cross);
-		Geometry3D cylinder1 = csg.cylinder3D(16, 1.4, angularResolution, false);
+		Geometry3D cylinder1 = csg.cylinder3D(13.1, 1.4, angularResolution, false);
 		union.add(cylinder1);
 		Geometry3D cylinder2 = csg.cylinder3D(10.8, 2, angularResolution, false);
 		union.add(csg.translate3DZ(1.4).transform(cylinder2));
@@ -251,9 +263,9 @@ public class BBAxlesAndPlates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 32);
+		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 128);
 
-		//Geometry3D test = bbAxlesAndPlates.axle(6);
+		//Geometry3D test = bbAxlesAndPlates.axle(7);
 		//Geometry3D test = bbAxlesAndPlates.axleLock();
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
@@ -269,7 +281,8 @@ public class BBAxlesAndPlates
 
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionSingleSupportPlate();
 
-		Geometry3D test = bbAxlesAndPlates.bbPlate2AxleLock();
+		Geometry3D test = bbAxlesAndPlates.bbPlate2();
+		//Geometry3D test = bbAxlesAndPlates.bbDummy();
 		csg.view(test);
 	}
 }

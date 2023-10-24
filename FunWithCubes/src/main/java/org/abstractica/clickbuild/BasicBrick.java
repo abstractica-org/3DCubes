@@ -162,6 +162,6 @@ public class BasicBrick
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		BasicBrick bb = new BasicBrick(csg, 1.0, 128);
 		Geometry3D brick = bb.basicBrick(1, 2, 3);
-		csg.view(brick);
+		csg.view(brick, 1);
 	}
 }
