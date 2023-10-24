@@ -1,6 +1,7 @@
-package org.abstractica.yat;
+package org.abstractica.smartcubes.base.bricks;
 
 import org.abstractica.javacsg.*;
+import org.abstractica.smartcubes.base.Features;
 
 import java.util.ArrayList;
 import java.util.List;
