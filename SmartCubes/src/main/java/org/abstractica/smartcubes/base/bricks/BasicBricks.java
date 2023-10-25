@@ -5,6 +5,7 @@ import org.abstractica.javacsg.JavaCSG;
 import org.abstractica.javacsg.JavaCSGFactory;
 import org.abstractica.smartcubes.base.Features;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,15 +153,18 @@ public class BasicBricks
 				cutouts.add(ballCutout2);
 			}
 		}
+		Geometry3D cutout = csg.union3D(cutouts);
 
-		return csg.difference3D(block, cutouts);
+		return csg.cache(csg.difference3D(block, cutout));
 	}
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		BasicBricks bb = new BasicBricks(csg, 1.0, 16);
-		Geometry3D brick = bb.basicBrick(2, 1, 2);
-		csg.view(brick, 0);
+		BasicBricks bb = new BasicBricks(csg, 1.0, 128);
+		for(int i = 6; i <= 12; ++i)
+		{
+			csg.saveSTL("FinalParts/Cubes/Cube" + i + "x1x1.stl", bb.basicBrick(i, 1, 1));
+		}
 	}
 }

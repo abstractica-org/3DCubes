@@ -3,6 +3,7 @@ package org.abstractica.smartcubes.base.bricks;
 import org.abstractica.javacsg.*;
 import org.abstractica.smartcubes.base.Features;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +23,12 @@ public class CrossBricks
 	public Geometry3D crossBrick(int length, int width, int height)
 	{
 		double h = scale*(16*height+8);
-		Geometry3D brick = csg.linearExtrude(h, false, crossBrickProfile(length, width));
+		Geometry3D brick = csg.cache(csg.linearExtrude(h, false, crossBrickProfile(length, width)));
 		List<Geometry3D> cutouts = new ArrayList<>();
 
 		//Horizontal plane
 		//Axles
-		Geometry3D zAxle = features.brickAxleCutout(height*2+1);
+		Geometry3D zAxle = csg.cache(features.brickAxleCutout(height*2+1));
 		List<Geometry3D> zAxleParts = new ArrayList<>();
 		zAxleParts.add(zAxle);
 		Geometry3D sphere = features.brickCenterSphereCutout();
@@ -35,7 +36,7 @@ public class CrossBricks
 		{
 			zAxleParts.add(csg.translate3DZ(scale*(i*16+12)).transform(sphere));
 		}
-		zAxle = csg.union3D(zAxleParts);
+		zAxle = csg.cache(csg.union3D(zAxleParts));
 		//Diagonal
 		int diag = length + width - 1;
 		for(int i = 0; i < diag; ++i)
@@ -178,8 +179,8 @@ public class CrossBricks
 				cutouts.add(csg.translate3D( scale*((length-1)*16+width*16+8),scale*(length-1)*16+ty, tz).transform(ball));
 			}
 		}
-
-		return csg.difference3D(brick, cutouts);
+		Geometry3D cutoutsUnion = csg.cache(csg.union3D(cutouts));
+		return csg.cache(csg.difference3D(brick, cutoutsUnion));
 	}
 
 	private Geometry2D crossBrickProfile(int length, int width)
@@ -198,11 +199,10 @@ public class CrossBricks
 		return csg.polygon2D(points);
 	}
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		CrossBricks cb = new CrossBricks(csg, 1.0, 128);
-		Geometry3D test = cb.crossBrick(5, 1, 1);
-		csg.view(test, 0);
+		csg.saveSTL("FinalParts/CrossBricks/CrossBrick" + 7 + "x1x1.stl", cb.crossBrick(7, 1, 1));
 	}
 }

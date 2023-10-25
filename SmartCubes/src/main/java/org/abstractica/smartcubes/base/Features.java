@@ -39,7 +39,7 @@ public class Features
 	public Geometry3D singleClickHole()
 	{
 		Geometry2D profile = clickHoleProfile();
-		return csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
+		return csg.cache(csg.rotateExtrude(csg.degrees(360), angularResolution, profile));
 	}
 
 	private Geometry2D brickAxleCutoutProfile(int length)
@@ -76,14 +76,15 @@ public class Features
 
 	public Geometry3D brickCenterSphereCutout()
 	{
-		return csg.sphere3D(scale*16, angularResolution, true);
+		return csg.cache(csg.sphere3D(scale*16, angularResolution, true));
 	}
 
 	//*********************************************  Brick Balls  ****************************************************
 
 	public Geometry3D ballCutout()
 	{
-		return csg.sphere3D(scale*4+0.2, angularResolution/2, true);
+		Geometry3D res = csg.sphere3D(scale*4+0.2, angularResolution/2, true);
+		return csg.cache(res);
 	}
 	public Geometry3D ballCutoutRow(int xCount)
 	{
@@ -96,7 +97,8 @@ public class Features
 
 	public Geometry3D ballAddon()
 	{
-		return csg.sphere3D(scale*4, angularResolution/2, true);
+		Geometry3D res = csg.sphere3D(scale*4, angularResolution/2, true);
+		return csg.cache(res);
 	}
 
 	public Geometry3D ballAddonRow(int xCount)
@@ -116,7 +118,7 @@ public class Features
 		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust);
 		Geometry3D baseCutout = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
 		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth+ clickerBaseCutoutWidthAdjust, scale*8, false);
-		return csg.intersection3D(baseCutout, widthBox);
+		return csg.cache(csg.intersection3D(baseCutout, widthBox));
 	}
 
 	public Geometry3D doubleClickerBaseCutout()
@@ -124,16 +126,16 @@ public class Features
 		Geometry3D baseA = clickerBaseCutout();
 		Geometry3D baseB = csg.rotate3DZ(csg.degrees(90)).transform(baseA);
 		Geometry3D base = csg.union3D(baseA, baseB);
-		return base;
+		return csg.cache(base);
 	}
 
 	public Geometry3D roundClickerBaseCutout()
 	{
 		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust);
-		return csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
+		return csg.cache(csg.rotateExtrude(csg.degrees(360), angularResolution, profile));
 	}
 
-	public Geometry3D clickerBase()
+	private Geometry3D clickerBase()
 	{
 		Geometry2D profile = clickerBaseProfile(-clickTolerance);
 		Geometry3D baseCutout = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
@@ -155,7 +157,7 @@ public class Features
 
 	//*********************************************  Clicker Tip  ****************************************************
 
-	public Geometry3D clickerTip(int length)
+	private Geometry3D clickerTip(int length)
 	{
 		Geometry2D profile = clickerTipProfile(length);
 		Geometry3D clicker = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
@@ -192,7 +194,7 @@ public class Features
 		Geometry3D slit = csg.box3D(scale*clickerSlit, scale*16, scale*(10), false);
 		slit = csg.translate3DZ(scale*4+(length-1)*8).transform(slit);
 		clicker = csg.difference3D(clicker, slit);
-		return clicker;
+		return csg.cache(clicker);
 	}
 
 	public Geometry3D doubleBaseClicker(int lengthA, int lengthB)
@@ -200,7 +202,7 @@ public class Features
 		Geometry3D bottom = baseClicker(lengthA);
 		Geometry3D top = csg.mirror3D(0,0,1).transform(baseClicker(lengthB));
 		//top = csg.translate3DZ(scale*8).transform(top);
-		return csg.union3D(bottom, top);
+		return csg.cache(csg.union3D(bottom, top));
 	}
 	// ***************************************** Helper functions ****************************************
 
@@ -234,7 +236,7 @@ public class Features
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		Features features = new Features(csg, 1.0, 128);
+		Features features = new Features(csg, 0.5, 128);
 
 		//Geometry3D test = features.brickAxleCutout(3);
 
