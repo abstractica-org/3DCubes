@@ -154,7 +154,6 @@ public class BasicBricks
 			}
 		}
 		Geometry3D cutout = csg.union3D(cutouts);
-
 		return csg.cache(csg.difference3D(block, cutout));
 	}
 
@@ -162,7 +161,7 @@ public class BasicBricks
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		BasicBricks bb = new BasicBricks(csg, 1.0, 128);
-		for(int i = 6; i <= 12; ++i)
+		for(int i = 8; i <= 12; ++i)
 		{
 			csg.saveSTL("FinalParts/Cubes/Cube" + i + "x1x1.stl", bb.basicBrick(i, 1, 1));
 		}
