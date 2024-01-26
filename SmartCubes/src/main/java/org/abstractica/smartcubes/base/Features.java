@@ -36,9 +36,9 @@ public class Features
 		return csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
 	}
 
-	public Geometry3D singleClickHole()
+	public Geometry3D singleClickHole(boolean fixOverhang)
 	{
-		Geometry2D profile = clickHoleProfile();
+		Geometry2D profile = clickHoleProfile(fixOverhang);
 		return csg.cache(csg.rotateExtrude(csg.degrees(360), angularResolution, profile));
 	}
 
@@ -51,14 +51,14 @@ public class Features
 		List<Geometry2D> sections = new ArrayList<>();
 		for(int i = 0; i < length; ++i)
 		{
-			Geometry2D section = clickHoleProfile();
+			Geometry2D section = clickHoleProfile(false);
 			section = csg.translate2DY(scale*8*i).transform(section);
 			sections.add(section);
 		}
 		return csg.union2D(sections);
 	}
 
-	private Geometry2D clickHoleProfile()
+	private Geometry2D clickHoleProfile(boolean fixOverhang)
 	{
 		List<Vector2D> points = new ArrayList<>();
 		points.add(csg.vector2D(0, 0));
@@ -68,7 +68,8 @@ public class Features
 		points.add(csg.vector2D(scale * clickDiameter * 0.5, scale * 5));
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5, scale * 6));
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5, scale * 8));
-		points.add(csg.vector2D(0, scale * 8));
+		double overhangHeight = fixOverhang ? scale * brickHoleDiameter * 0.5 : 0;
+		points.add(csg.vector2D(0, scale * 8 + overhangHeight));
 		return csg.polygon2D(points);
 	}
 
@@ -174,7 +175,7 @@ public class Features
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5 - clickTolerance, 0));
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5 - clickTolerance, scale * 2));
 		points.add(csg.vector2D(scale * clickDiameter * 0.5 - clickTolerance, scale * 3));
-		double l = scale * (length-1) * 8.0;
+		double l = (length-1) * 8.0;
 		points.add(csg.vector2D(scale * clickDiameter * 0.5 - clickTolerance, scale * (l+5)));
 		points.add(csg.vector2D(scale * (brickHoleDiameter * 0.5 - 0.4) - clickTolerance, scale * (l+5.6)));
 		points.add(csg.vector2D(scale * (brickHoleDiameter * 0.5 - 0.4) - clickTolerance, scale * (l+6.2)));
@@ -191,8 +192,8 @@ public class Features
 		Geometry3D tip = clickerTip(length);
 		tip = csg.translate3D(0,0,scale*4).transform(tip);
 		Geometry3D clicker = csg.union3D(base, tip);
-		Geometry3D slit = csg.box3D(scale*clickerSlit, scale*16, scale*(10), false);
-		slit = csg.translate3DZ(scale*4+(length-1)*8).transform(slit);
+		Geometry3D slit = csg.box3D(scale*clickerSlit, scale*16, scale*10, false);
+		slit = csg.translate3DZ(scale*(4+(length-1)*8)).transform(slit);
 		clicker = csg.difference3D(clicker, slit);
 		return csg.cache(clicker);
 	}
@@ -236,11 +237,14 @@ public class Features
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		Features features = new Features(csg, 0.5, 128);
+		Features features = new Features(csg, 1.0, 128);
 
-		//Geometry3D test = features.brickAxleCutout(3);
+		//&Geometry3D test = features.brickAxleCutout(3);
 
-		//Geometry3D test = features.baseCutout();
+		//Geometry3D test = features.clickerBaseCutout();
+
+		Geometry3D test = features.singleClickHole(true);
+
 
 		//Geometry3D test = features.clickerBase();
 
@@ -257,8 +261,8 @@ public class Features
 		//Geometry3D test = features.axle2(6);
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
-		Geometry3D test = features.doubleBaseClicker(1, 1);
-		test = csg.rotate3DX(csg.degrees(90)).transform(test);
+		//Geometry3D test = features.doubleBaseClicker(3, 1);
+		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
 		//Geometry3D test = features.doubleBaseClicker(3,3);
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);

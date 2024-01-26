@@ -13,6 +13,7 @@ public class Plates
 	private final JavaCSG csg;
 	private final double scale;
 	private final Features features;
+	private final int angularResolution;
 
 
 	public Plates(JavaCSG csg, double scale, int angularResolution)
@@ -20,9 +21,20 @@ public class Plates
 		this.csg = csg;
 		this.scale = scale;
 		this.features = new Features(csg, scale, angularResolution);
+		this.angularResolution = angularResolution;
 	}
 
-	public Geometry3D longPlate(int length)
+	public Geometry3D turnPlate()
+	{
+		Geometry3D plate = csg.cylinder3D(scale*24, scale*4, angularResolution, false);
+		Geometry3D cutOut = features.roundClickerBaseCutout();
+		Geometry3D turnPlate = csg.difference3D(plate, cutOut);
+		turnPlate = csg.rotate3DX(csg.degrees(180)).transform(turnPlate);
+		turnPlate = csg.translate3DZ(scale*4).transform(turnPlate);
+		return turnPlate;
+	}
+
+	public Geometry3D longPlate(int length, boolean extraLength)
 	{
 		Geometry3D tile = tile(false);
 		Geometry3D space = csg.box3D(scale*4, scale*24, scale*4, false);
@@ -31,14 +43,36 @@ public class Plates
 		double xPos = 0;
 		for(int i = 0; i < length; ++i)
 		{
-			parts.add(csg.translate3DX(xPos).transform(space));
-			xPos += scale*4;
+			if(i > 0 || extraLength)
+			{
+				parts.add(csg.translate3DX(xPos).transform(space));
+				xPos += scale*4;
+			}
 			parts.add(csg.translate3DX(xPos).transform(tile));
 			xPos += scale*24;
-			parts.add(csg.translate3DX(xPos).transform(space));
-			xPos += scale*4;
+			if(i < length-1 || extraLength)
+			{
+				parts.add(csg.translate3DX(xPos).transform(space));
+				xPos += scale*4;
+			}
 		}
 		return csg.union3D(parts);
+	}
+
+	public Geometry3D squarePlate()
+	{
+		Geometry3D plate = csg.box3D(scale*56, scale*56, scale*4, false);
+		plate = csg.translate3D(scale*28, scale*28, 0).transform(plate);
+		List<Geometry3D> cutouts = new ArrayList<>();
+		Geometry3D baseCutout = features.doubleClickerBaseCutout();
+		cutouts.add(csg.translate3D(scale*12, scale*12, 0).transform(baseCutout));
+		cutouts.add(csg.translate3D(scale*44, scale*12, 0).transform(baseCutout));
+		cutouts.add(csg.translate3D(scale*12, scale*44, 0).transform(baseCutout));
+		cutouts.add(csg.translate3D(scale*44, scale*44, 0).transform(baseCutout));
+		Geometry3D cutout = csg.union3D(cutouts);
+		plate = csg.difference3D(plate, cutout);
+		Geometry3D balls = csg.translate3DZ(scale*4).transform(features.ballAddonGrid(4, 4));
+		return csg.union3D(plate, balls);
 	}
 
 	public Geometry3D sidePlate(int xNeg, int xPos, int yNeg, int yPos)
@@ -266,8 +300,9 @@ public class Plates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		Plates sp = new Plates(csg, 1.0, 128);
-		csg.view(sp.insideCorner(1,1));
+		Plates sp = new Plates(csg, 1.0, 256);
+		csg.view(sp.longPlate(2, false));
+		//csg.view(sp.turnPlate());
 	}
 
 }

@@ -1,11 +1,12 @@
-package org.abstractica.yat;
+package org.abstractica.smartcubes.size8.ballbearings;
 
 import org.abstractica.javacsg.*;
+import org.abstractica.smartcubes.base.Features;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BBAxlesAndPlates
+public class BBAxlesAndPlatesOld
 {
 	private final JavaCSG csg;
 	private final int angularResolution;
@@ -16,7 +17,7 @@ public class BBAxlesAndPlates
 	private final double slitWidth = 2.4;
 	private final double axleCutoutTolerance = 0.2;
 
-	public BBAxlesAndPlates(JavaCSG csg, int angularResolution)
+	public BBAxlesAndPlatesOld(JavaCSG csg, int angularResolution)
 	{
 		this.csg = csg;
 		this.angularResolution = angularResolution;
@@ -263,13 +264,13 @@ public class BBAxlesAndPlates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 128);
+		BBAxlesAndPlatesOld bbAxlesAndPlates = new BBAxlesAndPlatesOld(csg, 128);
 
-		//Geometry3D test = bbAxlesAndPlates.axle(7);
+		//Geometry3D test = bbAxlesAndPlates.axle(0);
 		//Geometry3D test = bbAxlesAndPlates.axleLock();
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
-		//Geometry3D test = bbAxlesAndPlates.bbPlate();
+		Geometry3D test = bbAxlesAndPlates.bbPlate();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingC();
 		//Geometry3D test = bbAxlesAndPlates.axleLock();
 
@@ -281,7 +282,7 @@ public class BBAxlesAndPlates
 
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionSingleSupportPlate();
 
-		Geometry3D test = bbAxlesAndPlates.bbPlate2AxleFree();
+		//Geometry3D test = bbAxlesAndPlates.bbPlate2();
 		//Geometry3D test = bbAxlesAndPlates.bbDummy();
 		csg.view(test);
 	}

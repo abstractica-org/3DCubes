@@ -24,28 +24,41 @@ public class BBAxlesAndPlates
 		this.features = new Features(csg, 1, this.angularResolution);
 	}
 
-	public Geometry3D axle(int length)
+	public Geometry3D axle(int length, boolean doubleSlit)
 	{
-		double l = 2*6.5 + length*8;
-		Geometry2D profile = axleProfile(2*6.5 + length*8);
+		if(length < 2) throw new IllegalArgumentException("Axle length must be at least 2");
+		if(doubleSlit && length < 3) throw new IllegalArgumentException("Axle length must be at least 3 for double slit");
+		double l = 2*6.5 + (length-2)*8;
+		Geometry2D profile = axleProfile(l, doubleSlit);
 		Geometry3D axle = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
-		Geometry3D widthBox = csg.box3D(16, axleWidth, 20 + 8*length, false);
+		Geometry3D widthBox = csg.box3D(16, axleWidth, 22 + 8*length, false);
+		widthBox = csg.translate3DZ(-2).transform(widthBox);
 		axle = csg.intersection3D(axle, widthBox);
+
+		List<Geometry3D> cutOut = new ArrayList<>();
 		Geometry3D slit = csg.box3D(slitWidth, 16, 15, false);
-		slit = csg.translate3DZ(l+1-10).transform(slit);
-		axle = csg.difference3D(axle, slit);
+		if(doubleSlit)
+		{
+			Geometry3D bottomSLit = csg.translate3DZ(-15 + 1.8 + 9).transform(slit);
+			cutOut.add(bottomSLit);
+		}
+		slit = csg.translate3DZ(l+2-9).transform(slit);
+		cutOut.add(slit);
+		axle = csg.difference3D(axle, cutOut);
+		axle = csg.rotate3DX(csg.degrees(90)).transform(axle);
 		return axle;
 	}
 
 	public Geometry3D axleLock()
 	{
-		Geometry2D profile = axleProfile(5);
+		Geometry2D profile = axleProfile(5, false);
 		Geometry3D lock = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
 		Geometry3D widthBox = csg.box3D(16, slitWidth, 20, false);
 		lock = csg.intersection3D(lock, widthBox);
 		Geometry3D slit = csg.box3D(4, 16, 15, false);
 		slit = csg.translate3DZ(2).transform(slit);
 		lock = csg.difference3D(lock, slit);
+		lock = csg.rotate3DX(csg.degrees(90)).transform(lock);
 		return lock;
 	}
 
@@ -57,13 +70,24 @@ public class BBAxlesAndPlates
 		return bb;
 	}
 
-	public Geometry2D axleProfile(double length)
+	public Geometry2D axleProfile(double length, boolean doubleSlit)
 	{
 		List<Vector2D> points = new ArrayList<>();
-		points.add(csg.vector2D(0, 0));
-		points.add(csg.vector2D(axleDiameter * 0.5+1, 0));
-		points.add(csg.vector2D(axleDiameter * 0.5+1, 1.8));
-		points.add(csg.vector2D(axleDiameter * 0.5, 1.8));
+		if(doubleSlit)
+		{
+			points.add(csg.vector2D(0, -0.4));
+			points.add(csg.vector2D(axleDiameter * 0.5-0.6, -0.4));
+			points.add(csg.vector2D(axleDiameter * 0.5+0.6, 0.8));
+			points.add(csg.vector2D(axleDiameter * 0.5+0.6, 1.8));
+			points.add(csg.vector2D(axleDiameter * 0.5, 1.8));
+		}
+		else
+		{
+			points.add(csg.vector2D(0, 0));
+			points.add(csg.vector2D(axleDiameter * 0.5 + 1, 0));
+			points.add(csg.vector2D(axleDiameter * 0.5 + 1, 1.8));
+			points.add(csg.vector2D(axleDiameter * 0.5, 1.8));
+		}
 		points.add(csg.vector2D(axleDiameter * 0.5, length+2));
 		points.add(csg.vector2D(axleDiameter * 0.5+0.6, length+2));
 		points.add(csg.vector2D(axleDiameter * 0.5+0.6, length+3));
@@ -72,7 +96,7 @@ public class BBAxlesAndPlates
 		return csg.polygon2D(points);
 	}
 
-	public Geometry3D bbPlate()
+	public Geometry3D bbSimplePlate()
 	{
 		Geometry3D plate = csg.box3D(24, 24, 3.6, false);
 		Geometry3D bbCutout = csg.cylinder3D(16.1, 2.2, angularResolution, false);
@@ -91,7 +115,7 @@ public class BBAxlesAndPlates
 		return plate;
 	}
 
-	public Geometry3D bbPlate2()
+	public Geometry3D bbPlate()
 	{
 		Geometry3D plate = csg.box3D(24, 24, 3.6, false);
 		/*Geometry3D bbCutout = csg.cylinder3D(16.1, 3.6, angularResolution, false);*/
@@ -114,7 +138,7 @@ public class BBAxlesAndPlates
 		return plate;
 	}
 
-	public Geometry3D bbPlate2AxleLock()
+	public Geometry3D bbPlateAxleLock()
 	{
 		Geometry3D plate = bbPlate2Extension();
 		Geometry3D cutout = axleCutout(5);
@@ -122,7 +146,7 @@ public class BBAxlesAndPlates
 		return plate;
 	}
 
-	public Geometry3D bbPlate2AxleFree()
+	public Geometry3D bbPlateAxleFree()
 	{
 		Geometry3D plate = bbPlate2Extension();
 		Geometry3D cutout = csg.cylinder3D(9, 5, angularResolution, false);
@@ -134,6 +158,7 @@ public class BBAxlesAndPlates
 	{
 		return spacer(1.4);
 	}
+
 
 	public Geometry3D bbUnitSpacer()
 	{
@@ -158,26 +183,22 @@ public class BBAxlesAndPlates
 
 	public Geometry3D bbExtensionRingA()
 	{
-		Geometry3D ring = csg.cylinder3D(16.1, 9.4, angularResolution, false);
-		Geometry3D hole = csg.cylinder3D(11, 9.4, angularResolution, false);
-		ring = csg.difference3D(ring, hole);
-		return ring;
+		return bbExtensionRing(1.4);
 	}
 
 	public Geometry3D bbExtensionRingB()
 	{
-		Geometry3D ring = csg.cylinder3D(16.1, 1.4, angularResolution, false);
-		Geometry3D hole = csg.cylinder3D(11, 1.4, angularResolution, false);
-		ring = csg.difference3D(ring, hole);
-		return ring;
+		return bbExtensionRing(3);
 	}
 
 	public Geometry3D bbExtensionRingC()
 	{
-		Geometry3D ring = csg.cylinder3D(16.1, 3, angularResolution, false);
-		Geometry3D hole = csg.cylinder3D(11, 3, angularResolution, false);
-		ring = csg.difference3D(ring, hole);
-		return ring;
+		return bbExtensionRing(8);
+	}
+
+	public Geometry3D bbExtensionRingD()
+	{
+		return bbExtensionRing(9.6);
 	}
 
 	public Geometry3D bbExtension()
@@ -236,6 +257,14 @@ public class BBAxlesAndPlates
 		return csg.difference3D(spacer, hole);
 	}
 
+	private Geometry3D bbExtensionRing(double height)
+	{
+		Geometry3D ring = csg.cylinder3D(16.1, height, angularResolution, false);
+		Geometry3D hole = csg.cylinder3D(11, height, angularResolution, false);
+		ring = csg.difference3D(ring, hole);
+		return ring;
+	}
+
 	private Geometry3D bbPlate2Extension()
 	{
 		List<Geometry3D> union = new ArrayList<>();
@@ -264,14 +293,15 @@ public class BBAxlesAndPlates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 128);
+		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 256);
 
-		//Geometry3D test = bbAxlesAndPlates.axle(7);
-		//Geometry3D test = bbAxlesAndPlates.axleLock();
+
+		//Geometry2D test = bbAxlesAndPlates.axleProfile(21, true);
+		//Geometry3D test = bbAxlesAndPlates.axle(5, true);
+		Geometry3D test = bbAxlesAndPlates.axleLock();
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
-		//Geometry3D test = bbAxlesAndPlates.bbPlate();
-		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingC();
+		//Geometry3D test = bbAxlesAndPlates.bbSimplePlate();
 		//Geometry3D test = bbAxlesAndPlates.axleLock();
 
 		//Geometry3D test = bbAxlesAndPlates.bbThinSpacer();
@@ -282,8 +312,15 @@ public class BBAxlesAndPlates
 
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionSingleSupportPlate();
 
-		Geometry3D test = bbAxlesAndPlates.bbPlate2();
+		//Geometry3D test = bbAxlesAndPlates.bbPlate();
+		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleLock();
+		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleFree();
 		//Geometry3D test = bbAxlesAndPlates.bbDummy();
+
+		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingA();
+		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingB();
+		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingC();
+		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingD();
 		csg.view(test);
 	}
 }
