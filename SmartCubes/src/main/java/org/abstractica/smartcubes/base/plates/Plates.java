@@ -6,6 +6,7 @@ import org.abstractica.javacsg.JavaCSGFactory;
 import org.abstractica.smartcubes.base.Features;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Plates
@@ -297,12 +298,117 @@ public class Plates
 		return csg.union3D(plate);
 	}
 
+	public Geometry3D scalableTile(int length, int height, boolean roundHoles, boolean extraLength, boolean extraHeight)
+	{
+		//Geometry3D tile = tile(roundHoles);
+
+		Geometry3D space = csg.box3D(scale*4, scale*24, scale*4, false);
+		Geometry3D spaceY = csg.box3D(scale*24, scale*4, scale*4, false);
+		Geometry3D spaceCorner = csg.box3D(scale*4, scale*4, scale*4, false);
+
+		space = csg.translate3D(scale*2, scale*12, 0).transform(space);
+		spaceY = csg.translate3D(scale*12, scale*2, 0).transform(spaceY);
+		spaceCorner = csg.translate3D(scale*2, scale*2, 0).transform(spaceCorner);
+		HashSet<Geometry3D> parts = new HashSet<>();
+		double xPos = 0;
+		double yPos = 0;
+		for(int j = 0; j < height; ++j)
+		{
+			if (extraHeight && j == 0)
+			{
+				if (extraLength)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(space));
+					xPos += scale * 4;
+				}
+				for (int i = 0; i < length; ++i)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceY));
+					xPos += scale * 24;
+					if (i < length - 1)
+					{
+						parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceY));
+						xPos += scale * 4;
+					}
+				}
+
+				if (extraLength)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceCorner));
+				}
+
+				yPos = scale * 4;
+				xPos = 0;
+			}
+
+
+			for(int i = 0; i < length; ++i)
+			{
+				if (i > 0 || extraLength)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(space));
+					xPos += scale * 4;
+				}
+
+				Geometry3D tile = csg.box3D(scale*24, scale*24, scale*4, false);
+				tile = csg.translate3D(scale*12, scale*12, 0).transform(tile);
+				boolean validX = i == 0 || i == length - 1;
+				boolean validY = j == 0 || j == height - 1;
+				if (validX && validY)
+				{
+					Geometry3D balls = features.ballAddonGrid(2,2);
+					balls = csg.translate3DZ(scale*4).transform(balls);
+					tile = csg.union3D(tile, balls);
+
+					Geometry3D baseCutout = roundHoles ? features.roundClickerBaseCutout() : features.doubleClickerBaseCutout();
+					baseCutout = csg.translate3D(scale*12, scale*12, 0).transform(baseCutout);
+					tile = csg.difference3D(tile, baseCutout);
+				}
+				parts.add(csg.translate3D(xPos, yPos, 0).transform(tile));
+				xPos += scale * 24;
+				if (extraLength && i == length - 1)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(space));
+					xPos += scale * 4;
+				}
+			}
+			yPos += scale * 24;
+			xPos = 0;
+			if (extraHeight && j == height - 1)
+			{
+				if (extraLength)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceY));
+					xPos += scale * 4;
+				}
+				for (int i = 0; i < length; ++i)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceY));
+					xPos += scale * 24;
+					if (i < length - 1)
+					{
+						parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceY));
+						xPos += scale * 4;
+					}
+				}
+				if (extraLength)
+				{
+					parts.add(csg.translate3D(xPos, yPos, 0).transform(spaceCorner));
+				}
+			}
+		}
+		return csg.union3D(parts);
+	}
+
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		Plates sp = new Plates(csg, 1.0, 256);
-		csg.view(sp.longPlate(2, false));
-		//csg.view(sp.turnPlate());
+		// Geometry3D tile = sp.tile(false);
+		// csg.view(sp.longPlate(3, false));
+		csg.view(sp.scalableTile(5, 2, false, false, true));
+
+		// csg.view(tile);
 	}
 
 }

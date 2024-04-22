@@ -20,4 +20,5 @@ public class PoopBox
 		inner = csg.translate3DZ(wallWidth).transform(inner);
 		return csg.difference3D(outer, inner);
 	}
+
 }
