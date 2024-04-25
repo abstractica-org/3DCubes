@@ -302,8 +302,8 @@ public class Plates
 	{
 		if (nHolesWidth < 2 || nHolesHeight < 2) throw new IllegalArgumentException("Tile must be at least 2x2");
 
-		double extraL = extraWidth ? scale*4 : 0;
-		double extraH = extraHeight ? scale*4 : 0;
+		double extraL = extraWidth ? scale*4 *2: 0;
+		double extraH = extraHeight ? scale*4 *2: 0;
 
 		double x = nHolesWidth * 16 + 8;
 		double y = nHolesHeight * 16 + 8;
