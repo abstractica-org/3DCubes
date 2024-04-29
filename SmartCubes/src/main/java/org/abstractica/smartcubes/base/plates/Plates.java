@@ -370,7 +370,9 @@ public class Plates
 
 		Geometry3D plate = sp.scalableTile(8, 8, false, 0, 2);
 		Geometry3D angle = sp.angleTile(8, 1, 8, 1);
-		csg.view(csg.union3D(plate, angle));
+		csg.view(csg.union3D(plate, angle),1);
+
+
 		// csg.view(tile);
 	}
 

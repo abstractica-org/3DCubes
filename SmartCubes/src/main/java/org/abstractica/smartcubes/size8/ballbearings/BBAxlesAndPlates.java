@@ -298,7 +298,7 @@ public class BBAxlesAndPlates
 
 		//Geometry2D test = bbAxlesAndPlates.axleProfile(21, true);
 		//Geometry3D test = bbAxlesAndPlates.axle(5, true);
-		Geometry3D test = bbAxlesAndPlates.axleLock();
+		// Geometry3D test = bbAxlesAndPlates.axleLock();
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
 		//Geometry3D test = bbAxlesAndPlates.bbSimplePlate();
@@ -314,13 +314,14 @@ public class BBAxlesAndPlates
 
 		//Geometry3D test = bbAxlesAndPlates.bbPlate();
 		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleLock();
-		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleFree();
+		// Geometry3D test = bbAxlesAndPlates.bbPlateAxleFree();
 		//Geometry3D test = bbAxlesAndPlates.bbDummy();
 
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingA();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingB();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingC();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingD();
+		Geometry2D test = bbAxlesAndPlates.roundCross(1);
 		csg.view(test);
 	}
 }
