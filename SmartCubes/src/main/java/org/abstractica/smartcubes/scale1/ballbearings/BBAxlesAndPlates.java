@@ -1,4 +1,4 @@
-package org.abstractica.smartcubes.size8.ballbearings;
+package org.abstractica.smartcubes.scale1.ballbearings;
 
 import org.abstractica.javacsg.*;
 import org.abstractica.smartcubes.base.Features;
@@ -35,13 +35,24 @@ public class BBAxlesAndPlates
 		widthBox = csg.translate3DZ(-2).transform(widthBox);
 		axle = csg.intersection3D(axle, widthBox);
 
+		//Cutouts
 		List<Geometry3D> cutOut = new ArrayList<>();
+
+		//Long slit
+		Geometry3D longSlit = csg.box3D(slitWidth, 10, 22 + 8*length, false);
+		longSlit = csg.translate3DY(5+0.5*axleWidth-1).transform(longSlit);
+		longSlit = csg.translate3DZ(1.8).transform(longSlit);
+
+
+		//End slits
 		Geometry3D slit = csg.box3D(slitWidth, 16, 15, false);
 		if(doubleSlit)
 		{
 			Geometry3D bottomSLit = csg.translate3DZ(-15 + 1.8 + 9).transform(slit);
 			cutOut.add(bottomSLit);
 		}
+
+		cutOut.add(longSlit);
 		slit = csg.translate3DZ(l+2-9).transform(slit);
 		cutOut.add(slit);
 		axle = csg.difference3D(axle, cutOut);
@@ -53,7 +64,7 @@ public class BBAxlesAndPlates
 	{
 		Geometry2D profile = axleProfile(5, false);
 		Geometry3D lock = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
-		Geometry3D widthBox = csg.box3D(16, slitWidth, 20, false);
+		Geometry3D widthBox = csg.box3D(16, slitWidth-0.4, 20, false);
 		lock = csg.intersection3D(lock, widthBox);
 		Geometry3D slit = csg.box3D(4, 16, 15, false);
 		slit = csg.translate3DZ(2).transform(slit);
@@ -245,9 +256,13 @@ public class BBAxlesAndPlates
 
 	private Geometry3D axleCutout(double length)
 	{
-		Geometry3D cutout = csg.cylinder3D(axleDiameter+axleCutoutTolerance, length, angularResolution, false);
+		Geometry3D axleCutout = csg.cylinder3D(axleDiameter+axleCutoutTolerance, length, angularResolution, false);
 		Geometry3D widthBox = csg.box3D(16, axleWidth+axleCutoutTolerance, length, false);
-		return csg.intersection3D(cutout, widthBox);
+		axleCutout = csg.intersection3D(axleCutout, widthBox);
+		Geometry3D longSlit = csg.box3D(slitWidth-0.1, 10, length, false);
+		longSlit = csg.translate3DY(5+0.5*axleWidth-0.9).transform(longSlit);
+		axleCutout = csg.difference3D(axleCutout, longSlit);
+		return axleCutout;
 	}
 
 	private Geometry3D spacer(double width)
@@ -297,8 +312,8 @@ public class BBAxlesAndPlates
 
 
 		//Geometry2D test = bbAxlesAndPlates.axleProfile(21, true);
-		//Geometry3D test = bbAxlesAndPlates.axle(5, true);
-		Geometry3D test = bbAxlesAndPlates.axleLock();
+		//Geometry3D test = bbAxlesAndPlates.axle(9, true);
+		//Geometry3D test = bbAxlesAndPlates.axleLock();
 		//test = csg.rotate3DX(csg.degrees(90)).transform(test);
 
 		//Geometry3D test = bbAxlesAndPlates.bbSimplePlate();
@@ -313,7 +328,7 @@ public class BBAxlesAndPlates
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionSingleSupportPlate();
 
 		//Geometry3D test = bbAxlesAndPlates.bbPlate();
-		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleLock();
+		Geometry3D test = bbAxlesAndPlates.bbPlateAxleLock();
 		//Geometry3D test = bbAxlesAndPlates.bbPlateAxleFree();
 		//Geometry3D test = bbAxlesAndPlates.bbDummy();
 
@@ -321,6 +336,6 @@ public class BBAxlesAndPlates
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingB();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingC();
 		//Geometry3D test = bbAxlesAndPlates.bbExtensionRingD();
-		csg.view(test);
+		csg.view(test,1);
 	}
 }

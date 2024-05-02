@@ -1,4 +1,4 @@
-package org.abstractica.smartcubes.size8.ballbearings;
+package org.abstractica.smartcubes.scale1.ballbearings;
 
 import org.abstractica.javacsg.*;
 import org.abstractica.smartcubes.base.Features;

@@ -7,8 +7,9 @@ import org.abstractica.smartcubes.base.Features;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class Plates
+public class PlatesOld
 {
 	private final JavaCSG csg;
 	private final double scale;
@@ -16,7 +17,7 @@ public class Plates
 	private final int angularResolution;
 
 
-	public Plates(JavaCSG csg, double scale, int angularResolution)
+	public PlatesOld(JavaCSG csg, double scale, int angularResolution)
 	{
 		this.csg = csg;
 		this.scale = scale;
@@ -32,6 +33,45 @@ public class Plates
 		turnPlate = csg.rotate3DX(csg.degrees(180)).transform(turnPlate);
 		turnPlate = csg.translate3DZ(scale*4).transform(turnPlate);
 		return turnPlate;
+	}
+
+	public Geometry3D simplePlate(int x, int y, boolean roundHoles)
+	{
+		return simplePlate(x, y, roundHoles, null);
+	}
+
+	public Geometry3D simplePlate(int x, int y, boolean roundHoles, Set<HolePosition> removeHoles)
+	{
+		double xSize = scale*(16*x+8);
+		double ySize = scale*(16*y+8);
+
+		//Plate
+		Geometry3D plate = csg.box3D(xSize, ySize, scale*4, false);
+		plate = csg.translate3D(0.5*xSize, 0.5*ySize, 0).transform(plate);
+
+		//Holes
+		Geometry3D hole = roundHoles ? features.roundClickerBaseCutout() : features.doubleClickerBaseCutout();
+		List<Geometry3D> holes = new ArrayList<>();
+		for(int ix = 0; ix < x; ++ix)
+		{
+			for(int iy = 0; iy < y; ++iy)
+			{
+				if(removeHoles == null || !removeHoles.contains(new HolePosition(ix, iy)))
+				{
+					holes.add(csg.translate3D(scale * (12 + 16 * ix), scale * (12 + 16 * iy), 0).transform(hole));
+				}
+			}
+		}
+		plate = csg.difference3D(plate, holes);
+
+
+		//Balls
+		Geometry3D balls = features.ballAddonGrid(x+1, y+1);
+		balls = csg.translate3DZ(scale*4).transform(balls);
+		plate = csg.union3D(plate, balls);
+
+
+		return plate;
 	}
 
 	public Geometry3D longPlate(int length, boolean extraLength)
@@ -300,8 +340,10 @@ public class Plates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		Plates sp = new Plates(csg, 1.0, 256);
-		csg.view(sp.longPlate(2, false));
+		PlatesOld sp = new PlatesOld(csg, 1.0, 64);
+		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
+		csg.view(sp.simplePlate(3, 1, false, removeHoles));
+		//csg.view(sp.longPlate(2, false));
 		//csg.view(sp.turnPlate());
 	}
 
