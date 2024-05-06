@@ -348,8 +348,10 @@ public class Features
 
 		//Geometry3D test = features.getServoMotorBallBearingClicker();
 
-		Geometry3D test = features.getServoMotorClicker();
+		//Geometry3D test = features.getServoMotorClicker();
 
-		csg.view(test, 0);
+		Geometry3D test = features.getTTMotorAxleAdapter(2);
+
+		csg.view(test, 1);
 	}
 }
