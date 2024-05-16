@@ -6,10 +6,9 @@ import org.abstractica.javacsg.JavaCSGFactory;
 import org.abstractica.smartcubes.base.Features;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-public class Plates
+public class PlatesOld
 {
 	private final JavaCSG csg;
 	private final double scale;
@@ -17,7 +16,7 @@ public class Plates
 	private final int angularResolution;
 
 
-	public Plates(JavaCSG csg, double scale, int angularResolution)
+	public PlatesOld(JavaCSG csg, double scale, int angularResolution)
 	{
 		this.csg = csg;
 		this.scale = scale;
@@ -362,7 +361,7 @@ public class Plates
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		Plates sp = new Plates(csg, 1.0, 256);
+		PlatesOld sp = new PlatesOld(csg, 1.0, 256);
 		// Geometry3D tile = sp.tile(false);
 		// csg.view(sp.longPlate(3, false));
 		// csg.view(sp.scalableTile(8, 14, false, false, false));
