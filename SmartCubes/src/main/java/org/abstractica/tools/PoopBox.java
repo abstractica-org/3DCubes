@@ -5,7 +5,7 @@ import org.abstractica.javacsg.JavaCSG;
 import org.abstractica.javacsg.JavaCSGFactory;
 import org.abstractica.smartcubes.base.bricks.BasicBricks;
 import org.abstractica.smartcubes.base.bricks.CrossBricks;
-import org.abstractica.smartcubes.base.plates.Plates;
+import org.abstractica.smartcubes.base.plates.PlatesOld;
 
 public class PoopBox
 {
@@ -36,7 +36,7 @@ public class PoopBox
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		BasicBricks bb = new BasicBricks(csg, 1, 128);
 		CrossBricks cb = new CrossBricks(csg, 1, 128);
-		Plates p = new Plates(csg, 1, 128);
+		PlatesOld p = new PlatesOld(csg, 1, 128);
 
 		Geometry3D brick8 = bb.basicBrick(8, 1, 1);
 		csg.view(brick8, partnum++);
