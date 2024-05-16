@@ -20,8 +20,6 @@ public class Features
 
 	private final int angularResolution;
 
-
-
 	public Features(JavaCSG csg, double scale, int angularResolution)
 	{
 		this.csg = csg;
@@ -93,7 +91,8 @@ public class Features
 	}
 	public Geometry3D ballCutoutGrid(int xCount, int yCount, double height)
 	{
-		return make2DGrid(scale*4, scale*16, xCount, yCount, ballCutout());
+		Geometry3D grid = make2DGrid(scale*4, scale*16, xCount, yCount, ballCutout());
+		return csg.translate3DZ(height).transform(grid);
 	}
 
 	public Geometry3D ballAddon()
@@ -116,7 +115,7 @@ public class Features
 
 	public Geometry3D clickerBaseCutout()
 	{
-		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust);
+		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust, 0);
 		Geometry3D baseCutout = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
 		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth+ clickerBaseCutoutWidthAdjust, scale*8, false);
 		return csg.cache(csg.intersection3D(baseCutout, widthBox));
@@ -132,23 +131,24 @@ public class Features
 
 	public Geometry3D roundClickerBaseCutout()
 	{
-		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust);
+		Geometry2D profile = clickerBaseProfile(clickerBaseCutoutDiameterAdjust, 0);
 		return csg.cache(csg.rotateExtrude(csg.degrees(360), angularResolution, profile));
 	}
 
-	private Geometry3D clickerBase()
+	private Geometry3D clickerBase(double extraLength)
 	{
-		Geometry2D profile = clickerBaseProfile(-clickTolerance);
+		Geometry2D profile = clickerBaseProfile(-clickTolerance, extraLength);
 		Geometry3D baseCutout = csg.rotateExtrude(csg.degrees(360), angularResolution, profile);
-		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth, scale*8, false);
+		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth, scale*(8+extraLength), false);
+		widthBox = csg.translate3DZ(-scale*extraLength).transform(widthBox);
 		return csg.intersection3D(baseCutout, widthBox);
 	}
 
-	private Geometry2D clickerBaseProfile(double adjustRadius)
+	private Geometry2D clickerBaseProfile(double adjustRadius, double extraLength)
 	{
 		List<Vector2D> points = new ArrayList<>();
-		points.add(csg.vector2D(0, 0));
-		points.add(csg.vector2D(scale * baseDiameter * 0.5 + adjustRadius, 0));
+		points.add(csg.vector2D(0, -scale*extraLength));
+		points.add(csg.vector2D(scale * baseDiameter * 0.5 + adjustRadius, -scale*extraLength));
 		points.add(csg.vector2D(scale * baseDiameter * 0.5 + adjustRadius, scale * 1.5));
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5 + adjustRadius, scale * 2.5));
 		points.add(csg.vector2D(scale * brickHoleDiameter * 0.5 + adjustRadius, scale * 4));
@@ -188,7 +188,12 @@ public class Features
 
 	public Geometry3D baseClicker(int length)
 	{
-		Geometry3D base = clickerBase();
+		return baseClicker(length, 0);
+	}
+
+	public Geometry3D baseClicker(int length, double extraTail)
+	{
+		Geometry3D base = clickerBase(extraTail);
 		Geometry3D tip = clickerTip(length);
 		tip = csg.translate3D(0,0,scale*4).transform(tip);
 		Geometry3D clicker = csg.union3D(base, tip);
@@ -200,11 +205,73 @@ public class Features
 
 	public Geometry3D doubleBaseClicker(int lengthA, int lengthB)
 	{
-		Geometry3D bottom = baseClicker(lengthA);
-		Geometry3D top = csg.mirror3D(0,0,1).transform(baseClicker(lengthB));
+		Geometry3D bottom = baseClicker(lengthA, 0);
+		Geometry3D top = csg.mirror3D(0,0,1).transform(baseClicker(lengthB, 0));
 		//top = csg.translate3DZ(scale*8).transform(top);
 		return csg.cache(csg.union3D(bottom, top));
 	}
+
+	// *****************************************  Special adapters ***************************************
+
+	public Geometry3D getTTMotorAxleAdapter(int length)
+	{
+		double extraLength = 5.2 + length * 8;
+		Geometry3D clickerBase = baseClicker(1, extraLength);
+		clickerBase = csg.translate3DZ(extraLength).transform(clickerBase);
+		Geometry3D cyl = csg.cylinder3D(5.35, 7.8, angularResolution/2, true);
+		Geometry3D box = csg.box3D(3.8, 6, 10, true);
+		Geometry3D axle = csg.intersection3D(cyl, box);
+		axle = csg.translate3D(0, 0, 3.89).transform(axle);
+		Geometry3D res = csg.difference3D(clickerBase, axle);
+		res = csg.rotate3DX(csg.degrees(90)).transform(res);
+		return res;
+	}
+
+	public Geometry3D getServoMotorClicker()
+	{
+		double extraLength = 4;
+		Geometry3D clickerBase = baseClicker(1, extraLength);
+		clickerBase = csg.rotate3DX(csg.degrees(90)).transform(clickerBase);
+		return clickerBase;
+	}
+
+	public Geometry3D getServoMotorAxelMount()
+	{
+		Geometry3D cylinder = csg.cylinder3D(15, 9.6, angularResolution/2, false);
+		Geometry3D hole = csg.cylinder3D(5.8, 5, angularResolution/2, false);
+		hole = csg.translate3DZ(-1).transform(hole);
+		Geometry3D res = csg.difference3D(cylinder, hole);
+		Geometry3D axle = csg.cylinder3D(scale*baseDiameter, 5, angularResolution/2, false);
+		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth, scale*8, false);
+		axle = csg.intersection3D(axle, widthBox);
+		axle = csg.translate3DZ(5.6).transform(axle);
+		res = csg.difference3D(res, axle);
+		return res;
+	}
+
+	public Geometry3D getServoMotorBallBearingClicker()
+	{
+		Geometry3D clickerBase = baseClicker(1, 9);
+		clickerBase = csg.translate3DZ(9).transform(clickerBase);
+		clickerBase = csg.rotate3DX(csg.degrees(180)).transform(clickerBase);
+		Geometry3D axle = csg.cylinder3D(8, 8, angularResolution/2, false);
+		Geometry3D widthBox = csg.box3D(scale*16, scale*clickerWidth, 8, false);
+		axle = csg.intersection3D(axle, widthBox);
+		Geometry3D res = csg.union3D(clickerBase, axle);
+
+		/*
+		//Temporary code to make the axle fit the ball bearing hole
+		Geometry3D cutCyl1 = csg.cylinder3D(10, 15, angularResolution/2, false);
+		cutCyl1 = csg.translate3DZ(-6).transform(cutCyl1);
+		Geometry3D cutCyl2 = csg.cylinder3D(20, 20, angularResolution/2, false);
+		cutCyl2 = csg.translate3DZ(-26).transform(cutCyl2);
+		Geometry3D cutcyl = csg.union3D(cutCyl1, cutCyl2);
+		res = csg.intersection3D(res, cutcyl);
+		*/
+		res = csg.rotate3DX(csg.degrees(90)).transform(res);
+		return res;
+	}
+
 	// ***************************************** Helper functions ****************************************
 
 	private Geometry3D makeRow(double offSet, double spacing, int xCount, Geometry3D geometry)
@@ -233,20 +300,21 @@ public class Features
 		return csg.union3D(grid);
 	}
 
-
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		Features features = new Features(csg, 1.0, 128);
 
-		//&Geometry3D test = features.brickAxleCutout(3);
+		//Geometry3D test = features.brickAxleCutout(3);
 
 		//Geometry3D test = features.clickerBaseCutout();
 
-		Geometry3D test = features.singleClickHole(true);
+		//Geometry3D test = features.baseClicker(1, 8);
+
+		//Geometry3D test = features.singleClickHole(true);
 
 
-		//Geometry3D test = features.clickerBase();
+		//Geometry3D test = features.clickerBase(0);
 
 		//Geometry2D test = features.clickerProfile();
 
@@ -274,6 +342,16 @@ public class Features
 
 		//Geometry3D test = features.roundClickerBaseCutout();
 
-		csg.view(test, 0);
+		//Geometry3D test = features.getTTMotorAxleAdapter(2);
+
+		//Geometry3D test = features.getServoMotorAxelMount();
+
+		//Geometry3D test = features.getServoMotorBallBearingClicker();
+
+		//Geometry3D test = features.getServoMotorClicker();
+
+		Geometry3D test = features.getTTMotorAxleAdapter(2);
+
+		csg.view(test, 1);
 	}
 }
