@@ -337,14 +337,82 @@ public class PlatesOld
 		return csg.union3D(plate);
 	}
 
+	public Geometry3D scalableTile(int nHolesWidth, int nHolesHeight, boolean roundHoles, int extraWidth, int extraHeight)
+	{
+		if (nHolesWidth < 2 || nHolesHeight < 2) throw new IllegalArgumentException("Tile must be at least 2x2");
+
+		double extraH = scale *4 *2 * extraHeight;
+		double extraL = scale *4 *2 * extraWidth;
+
+		double x = nHolesWidth * 16 + 8;
+		double y = nHolesHeight * 16 + 8;
+
+		double width = scale * x + extraL;
+		double height = scale * y + extraH;
+
+		Geometry3D plate = csg.box3D(width, height, scale*4, false);
+		plate = csg.translate3D(width/2-extraL/2, height/2-extraH/2, 0).transform(plate);
+
+		// Hole cutouts
+		Geometry3D baseCutout = roundHoles ? features.roundClickerBaseCutout() : features.doubleClickerBaseCutout();
+
+		Geometry3D rightDown =  csg.translate3D(scale*x-scale*12, scale*12, 0).transform(baseCutout);
+		Geometry3D leftDown =  csg.translate3D(scale*12, scale*12, 0).transform(baseCutout);
+		Geometry3D rightUp =  csg.translate3D(scale*x-scale*12, scale*y-scale*12, 0).transform(baseCutout);
+		Geometry3D leftUp =  csg.translate3D(scale*12, scale*y-scale*12, 0).transform(baseCutout);
+
+		Geometry3D totalCutout = csg.union3D(rightDown, leftDown, rightUp, leftUp);
+
+		plate = csg.difference3D(plate, totalCutout);
+
+		// Balls
+		Geometry3D balls = features.ballAddonGrid(2,2);
+		balls = csg.translate3DZ(scale*4).transform(balls);
+
+		Geometry3D ballsRightDown = csg.translate3D(scale*x-scale*24, 0, 0).transform(balls);
+		Geometry3D ballsLeftDown = csg.translate3D(0, 0, 0).transform(balls);
+		Geometry3D ballsRightUp = csg.translate3D(scale*x-scale*24, scale*y-scale*24, 0).transform(balls);
+		Geometry3D ballsLeftUp = csg.translate3D(0, scale*y-scale*24, 0).transform(balls);
+
+		Geometry3D total = csg.union3D(plate, ballsRightDown, ballsLeftDown, ballsRightUp, ballsLeftUp);
+
+		return csg.cache(total);
+	}
+
+	public Geometry3D angleTile(int nHolesWidth, int nHolesHeight, int nHolesOffsetY, int extraOffsetY)
+	{
+		double x = nHolesWidth * 16 + 8;
+		double y = nHolesHeight * 16 + 8;
+		double offsetY = nHolesOffsetY * 16 + 8 + (scale * 4 * extraOffsetY);
+
+		double width = scale * x;
+		double height = scale * y;
+		double offset = scale * offsetY;
+
+		Geometry3D plate = csg.box3D(width, height, scale*4, false);
+		plate = csg.translate3D(width/2, height/2, 0).transform(plate);
+
+		Geometry3D angle = csg.rotate3DX(csg.degrees(-45)).transform(plate);
+		angle = csg.translate3DY(offset).transform(angle);
+		return angle;
+	}
+
+
 	public static void main(String[] args)
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
-		PlatesOld sp = new PlatesOld(csg, 1.0, 64);
-		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
-		csg.view(sp.simplePlate(3, 1, false, removeHoles));
-		//csg.view(sp.longPlate(2, false));
-		//csg.view(sp.turnPlate());
+		PlatesOld sp = new PlatesOld(csg, 1.0, 256);
+		// Geometry3D tile = sp.tile(false);
+		// csg.view(sp.longPlate(3, false));
+		// csg.view(sp.scalableTile(8, 14, false, false, false));
+		// csg.view(sp.scalableTile(8, 8, false, 0, 0));
+
+		Geometry3D plate = sp.scalableTile(8, 8, false, 0, 2);
+		Geometry3D angle = sp.angleTile(8, 1, 8, 1);
+		csg.view(csg.union3D(plate, angle),1);
+
+
+		// csg.view(tile);
 	}
 
 }

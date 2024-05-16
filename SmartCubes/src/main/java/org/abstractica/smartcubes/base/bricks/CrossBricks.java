@@ -203,6 +203,7 @@ public class CrossBricks
 	{
 		JavaCSG csg = JavaCSGFactory.createNoCaching();
 		CrossBricks cb = new CrossBricks(csg, 1.0, 128);
-		csg.saveSTL("FinalParts/CrossBricks/CrossBrick" + 7 + "x1x1.stl", cb.crossBrick(7, 1, 1));
+		// csg.saveSTL("FinalParts/CrossBricks/CrossBrick" + 7 + "x1x1.stl", cb.crossBrick(7, 1, 1));
+		csg.view(cb.crossBrick(7, 1, 1));
 	}
 }
