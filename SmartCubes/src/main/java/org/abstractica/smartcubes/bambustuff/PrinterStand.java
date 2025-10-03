@@ -42,7 +42,7 @@ public class PrinterStand
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		PrinterStand printerStand = new PrinterStand(csg, 1, 128);
 		Geometry3D printerStandGeometry = printerStand.printerStand();
 		csg.view(printerStandGeometry);

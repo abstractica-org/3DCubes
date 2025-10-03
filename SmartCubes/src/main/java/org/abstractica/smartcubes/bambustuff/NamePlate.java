@@ -68,7 +68,7 @@ public class NamePlate
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		NamePlate namePlate = new NamePlate(csg, 1, 128);
 		Geometry3D geometry = namePlate.namePlate(5, "P1S 11", false);
 		csg.view(geometry);

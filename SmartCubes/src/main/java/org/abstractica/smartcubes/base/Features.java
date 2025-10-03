@@ -302,7 +302,7 @@ public class Features
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		Features features = new Features(csg, 1.0, 128);
 
 		//Geometry3D test = features.brickAxleCutout(3);

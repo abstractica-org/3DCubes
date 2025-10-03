@@ -17,7 +17,7 @@ public class Plate8x1 implements Part
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		Plate8x1 plate = new Plate8x1();
 		System.out.println("Generating " + plate.getName() + " as view0.scad");
 		Geometry3D geometry = plate.getGeometry(csg, 1, 128);

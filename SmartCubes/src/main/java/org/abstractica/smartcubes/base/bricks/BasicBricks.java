@@ -159,7 +159,7 @@ public class BasicBricks
 
 	public static void main(String[] args) throws IOException
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		BasicBricks bb = new BasicBricks(csg, 1.0, 128);
 		for(int i = 8; i <= 12; ++i)
 		{

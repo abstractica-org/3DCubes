@@ -169,7 +169,7 @@ public class TTMotor
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		TTMotor motor = new TTMotor(csg, true, 0, 0.8);
 		Geometry3D cutout = motor.getCutout();
 		cutout = csg.translate3DY(16).transform(cutout);

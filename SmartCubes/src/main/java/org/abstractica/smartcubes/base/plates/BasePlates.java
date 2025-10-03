@@ -93,7 +93,7 @@ public class BasePlates
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		BasePlates sp = new BasePlates(csg, 1.0, 64);
 		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
 		csg.view(sp.basePlate(3, 1, 2, 1, 1, 0, false, removeHoles));

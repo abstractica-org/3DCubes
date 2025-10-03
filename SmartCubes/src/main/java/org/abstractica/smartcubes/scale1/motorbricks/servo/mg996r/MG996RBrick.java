@@ -152,7 +152,7 @@ public class MG996RBrick implements Part
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		MG996RBrick brick = new MG996RBrick();
 		Geometry3D geometry = brick.getGeometry(csg, 1, 128);
 		csg.view(geometry);

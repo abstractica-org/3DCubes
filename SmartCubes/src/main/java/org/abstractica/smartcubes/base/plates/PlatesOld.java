@@ -339,7 +339,7 @@ public class PlatesOld
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		PlatesOld sp = new PlatesOld(csg, 1.0, 64);
 		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
 		csg.view(sp.simplePlate(3, 1, false, removeHoles));

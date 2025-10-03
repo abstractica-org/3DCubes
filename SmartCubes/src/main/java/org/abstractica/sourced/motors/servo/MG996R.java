@@ -62,7 +62,7 @@ public class MG996R
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		MG996R motor = new MG996R(csg, 128);
 		Geometry3D cutout = motor.motorCutout(12, 20);
 		cutout = csg.rotate3DX(csg.degrees(-90)).transform(cutout);

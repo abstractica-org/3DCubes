@@ -263,7 +263,7 @@ public class BBAxlesAndPlatesOld
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		BBAxlesAndPlatesOld bbAxlesAndPlates = new BBAxlesAndPlatesOld(csg, 128);
 
 		//Geometry3D test = bbAxlesAndPlates.axle(0);

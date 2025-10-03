@@ -201,7 +201,7 @@ public class CrossBricks
 
 	public static void main(String[] args) throws IOException
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		CrossBricks cb = new CrossBricks(csg, 1.0, 128);
 		csg.saveSTL("FinalParts/CrossBricks/CrossBrick" + 7 + "x1x1.stl", cb.crossBrick(7, 1, 1));
 	}

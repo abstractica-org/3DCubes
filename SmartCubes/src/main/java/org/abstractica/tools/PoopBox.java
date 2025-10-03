@@ -8,7 +8,7 @@ public class PoopBox
 {
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		Geometry3D poopBox = poopBox(csg, 200, 200, 120, 1);
 		csg.view(poopBox);
 	}

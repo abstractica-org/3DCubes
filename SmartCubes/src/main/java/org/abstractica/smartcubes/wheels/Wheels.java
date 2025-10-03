@@ -80,7 +80,7 @@ public class Wheels
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		Wheels wheels = new Wheels(csg, 128);
 		Geometry3D tire = wheels.wheel(24,200, 8, 4, 8);
 		csg.view(tire);

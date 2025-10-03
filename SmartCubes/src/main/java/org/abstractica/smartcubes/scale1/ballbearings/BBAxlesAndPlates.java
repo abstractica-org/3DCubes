@@ -307,7 +307,7 @@ public class BBAxlesAndPlates
 
 	public static void main(String[] args)
 	{
-		JavaCSG csg = JavaCSGFactory.createNoCaching();
+		JavaCSG csg = JavaCSGFactory.createDefault();
 		BBAxlesAndPlates bbAxlesAndPlates = new BBAxlesAndPlates(csg, 256);
 
 
