@@ -4,7 +4,7 @@ import org.abstractica.javacsg.Geometry3D;
 import org.abstractica.javacsg.JavaCSG;
 import org.abstractica.javacsg.JavaCSGFactory;
 import org.abstractica.smartcubes.base.plates.BasePlates;
-import org.abstractica.smartcubes.base.plates.HolePosition;
+import org.abstractica.smartcubes.base.plates.Vector2i;
 import org.abstractica.smartcubes.base.Part;
 
 import java.util.Set;
@@ -15,14 +15,14 @@ public class Plate3x3_4Holes implements Part
 	public Geometry3D getGeometry(JavaCSG csg, double scale, int angularResolution)
 	{
 		BasePlates bp = new BasePlates(csg, scale, angularResolution);
-		Set<HolePosition> removeHoles = Set.of(
-				new HolePosition(1, 0),
-				new HolePosition(0, 1),
-				new HolePosition(1, 1),
-				new HolePosition(2, 1),
-				new HolePosition(1, 2)
+		Set<Vector2i> removeHoles = Set.of(
+				new Vector2i(1, 0),
+				new Vector2i(0, 1),
+				new Vector2i(1, 1),
+				new Vector2i(2, 1),
+				new Vector2i(1, 2)
 		);
-		return bp.basePlate(3, 3, 0, 0, 0, 0, false, removeHoles);
+		return bp.basePlate(3, 3, 0, 0, 0, 0, true, removeHoles);
 	}
 
 	public static void main(String[] args)

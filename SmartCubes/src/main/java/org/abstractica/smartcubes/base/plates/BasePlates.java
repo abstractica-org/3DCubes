@@ -45,7 +45,7 @@ public class BasePlates
 	public Geometry3D basePlate(int x, int y,
 	                             int extraNorth, int extraSouth, int extraEast, int extraWest,
 	                             boolean roundHoles,
-	                             Set<HolePosition> removeHoles)
+	                             Set<Vector2i> removeHoles)
 	{
 		double xSize = scale*(16*x+8);
 		double ySize = scale*(16*y+8);
@@ -72,7 +72,7 @@ public class BasePlates
 		{
 			for(int iy = 0; iy < y; ++iy)
 			{
-				if(removeHoles == null || !removeHoles.contains(new HolePosition(ix, iy)))
+				if(removeHoles == null || !removeHoles.contains(new Vector2i(ix, iy)))
 				{
 					holes.add(csg.translate3D(scale * (12 + 16 * ix), scale * (12 + 16 * iy), 0).transform(hole));
 				}
@@ -95,7 +95,7 @@ public class BasePlates
 	{
 		JavaCSG csg = JavaCSGFactory.createDefault();
 		BasePlates sp = new BasePlates(csg, 1.0, 64);
-		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
+		Set<Vector2i> removeHoles = Set.of(new Vector2i(1, 0));
 		csg.view(sp.basePlate(3, 1, 2, 1, 1, 0, false, removeHoles));
 		//csg.view(sp.longPlate(2, false));
 		//csg.view(sp.turnPlate());

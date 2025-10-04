@@ -1,11 +1,11 @@
 package org.abstractica.smartcubes.base.plates;
 
-public class HolePosition
+public class Vector2i
 {
 	public final int x;
 	public final int y;
 
-	public HolePosition(int x, int y)
+	public Vector2i(int x, int y)
 	{
 		this.x = x;
 		this.y = y;
@@ -17,7 +17,7 @@ public class HolePosition
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		HolePosition that = (HolePosition) o;
+		Vector2i that = (Vector2i) o;
 
 		if (x != that.x) return false;
 		return y == that.y;

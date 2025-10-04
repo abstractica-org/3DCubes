@@ -40,7 +40,7 @@ public class PlatesOld
 		return simplePlate(x, y, roundHoles, null);
 	}
 
-	public Geometry3D simplePlate(int x, int y, boolean roundHoles, Set<HolePosition> removeHoles)
+	public Geometry3D simplePlate(int x, int y, boolean roundHoles, Set<Vector2i> removeHoles)
 	{
 		double xSize = scale*(16*x+8);
 		double ySize = scale*(16*y+8);
@@ -56,7 +56,7 @@ public class PlatesOld
 		{
 			for(int iy = 0; iy < y; ++iy)
 			{
-				if(removeHoles == null || !removeHoles.contains(new HolePosition(ix, iy)))
+				if(removeHoles == null || !removeHoles.contains(new Vector2i(ix, iy)))
 				{
 					holes.add(csg.translate3D(scale * (12 + 16 * ix), scale * (12 + 16 * iy), 0).transform(hole));
 				}
@@ -341,7 +341,7 @@ public class PlatesOld
 	{
 		JavaCSG csg = JavaCSGFactory.createDefault();
 		PlatesOld sp = new PlatesOld(csg, 1.0, 64);
-		Set<HolePosition> removeHoles = Set.of(new HolePosition(1, 0));
+		Set<Vector2i> removeHoles = Set.of(new Vector2i(1, 0));
 		csg.view(sp.simplePlate(3, 1, false, removeHoles));
 		//csg.view(sp.longPlate(2, false));
 		//csg.view(sp.turnPlate());
